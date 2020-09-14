@@ -1,0 +1,255 @@
+
+
+
+
+Create table pedidos(
+ `id` INT PRIMARY KEY,
+ `produto_id` INT,
+ `quantidade` INT
+ );
+
+
+Create table pedidos (
+ `id` INT PRIMARY KEY,
+ `produto_id` INT,
+ `quantidade` INT,
+ FOREIGN KEY (produto_id) REFERENCES produtos(id)
+ );
+
+
+
+ALTER TABLE `mysqlcourse`.`pedidos`
+ADD FOREIGN KEY (produto_id) REFERENCES produtos(id);
+
+
+
+
+ALTER TABLE pedidos add column total double;
+
+
+ALTER TABLE pedidos drop column total;
+
+
+
+ALTER TABLE clientes ADD CONSTRAINT cpf_unico UNIQUE(cpf);
+
+alter table clientes MODIFY cpf varchar(14) not null;
+
+alter table clientes drop index cpf_unico;
+
+#SETANDO E REMOVENDO O VALOR PADRAO
+
+alter table pedido add column total double;
+
+alter table pedidos alter column total set default 0;
+
+alter table pedidos alter column total drop default;
+
+##INSERINDO REGISTROS
+
+INSERT INTO clientes (id, nome, email, cpf)
+VALUES (1, 'Joao da Silva', 'joao@joao.com', '333.333.333-00');
+
+select * from clientes;
+
+
+
+select nome, email from clientes;
+
+
+insert into clientes values (2, 'Mario', 'mario@mario.com', '111.111.111-11');
+
+
+## ALTERANDO REGISTROS
+
+UPDATE clientes set nome='Mario da Silva'
+WHERE id=2;
+select * from clientes;
+///////////////////////
+
+UPDATE clientes set 
+	nome='Mario da Silva',
+    email='mariosilva@mario.com'
+WHERE id=2;
+select * from clientes;
+
+//////////////
+
+## REMOVER REGISTROS
+
+DELETE from clientes
+WHERE id=2;
+
+
+
+##INICIANDO COM O SELECT
+select * from clientes;
+
+##ALIAS
+
+insert into clientes values(3, 'Federico', 'fede@federico.com', '333');
+
+select id as 'Codigo',nome from clientes;
+
+
+## DISTINCT
+
+alter table clientes add column uf char(2);
+
+update clientes set uf='SP' where id=1;
+select * from clientes;
+
+select uf from clientes;
+
+
+select distinct uf from clientes;
+
+
+## ORDER BY
+
+select * from clientes ORDER  BY nome;
+
+select * from clientes ORDER  BY nome ASC;
+
+select * from clientes ORDER  BY nome DESC;
+
+## WHERE
+
+select * from clientes
+where uf='SP'
+ODER BY nome DESC;
+
+
+select * from produtos
+where preco < 120;
+
+select * from produtos
+where preco >90 and preco < 120;
+
+select * from produtos
+where preco >90 OR preco < 120;
+
+
+### LIKE
+
+select * from produtos
+where nome like 'Produto&';   NAO fiunciona!!!!!
+
+
+## Funcoes
+
+select count(*) from produtos;
+
+select max(preco) from produtos;
+
+select *, max(preco) from produtos;  nao funciona
+
+
+select avg(preco) as precaa from produtos;
+
+
+select(preco) as precaa from produtos;
+
+select sum(preco) as precaa from produtos;
+
+
+## GROUP
+
+select uf, count(*) as 'Quantidade de clientes ' from clientes
+group by uf;
+
+## JOIN
+
+select *, nome from pedidos, produtos
+where pedidos.produto_id = produtos.id
+;
+
+
+select pedidos.id, nome, quantidade, preco as 'valor unitario'
+from pedidos, produtos
+where pedidos.produto_id = produtos.id
+;
+
+
+## First Procedure
+
+select * from INFORMATION_SCHEMA.ROUTINES;
+
+--------------------
+
+DELIMITER &&
+
+select * from INFORMATION_SCHEMA.ROUTINES&&    // troca o delimitador
+
+-------------
+DELIMITER &&
+
+CREATE PROCEDURE PRIMEIRA()
+BEGIN
+	SELECT 'Minha primeira rotina';
+END &&
+
+DELIMITER ;
+
+-------------------
+
+CALL PRIMEIRA()  //para chamar a procedure
+
+
+### CRIANDO PROCEDURE DE PEDIDOS
+
+alter table produtos ADD column estoque int;
+select * from produtos;
+
+--------------------------------
+
+update produtos set estoque=10
+where id=2;
+select * from produtos;
+
+------------
+
+DELIMITER &&
+
+CREATE PROCEDURE faz_pedido(p_id int, qtd int, valor double)
+BEGIN
+	insert into pedidos values(p_id, qtd, valor);
+    update produtos set estoque=estoque-qtd where id=p_id;
+END
+DELIMITER ;
+------------------
+
+DELIMITER &&
+DROP PROCEDURE if EXISTS faz_pedido &&
+CREATE PROCEDURE faz_pedido(p_id int, qtd int, valor double)
+BEGIN
+	insert into pedidos values(p_id, qtd, valor);
+    update produtos set estoque=estoque-qtd where id=p_id;
+
+END &&
+
+DELIMITER ;
+
+CALL faz_pedido(2,3,300)
+
+--------------
+### CRIANDO VIEWS
+
+CREATE VIEW v_clientes_sp AS
+SELECT * from clientes where uf='SP';
+
+-------
+
+select * from v_clientes_sp;
+
+
+## MODELANDO
+
+https://ibb.co/z23fHgN
+
+
+## relacionamentos
+
+>database > synchronize model 
+
+https://ibb.co/Lp0yxYM
